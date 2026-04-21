@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+
+.slick-prev,
+.slick-next {
+  background: rgb(17, 17, 17) !important;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 10;
+  margin-left: 30px;
+  margin-right: 30px;
+}
+
+.slick-slide > div {
+  height: 100%;
+}
+
+.slick-track {
+  display: flex !important;
+}
+
+.slick-slide {
+  height: auto !important;
+}
