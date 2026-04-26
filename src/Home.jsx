@@ -5,55 +5,65 @@ import Slider from "react-slick";
 import { Link } from 'react-router-dom';
 
 export default function Home() {
-
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
     fetch("https://dummyjson.com/products?limit=200")
-      .then(res => res.json())
-      .then(data => setProducts(data.products))
-      .catch(err => console.log(err));
+      .then((res) => res.json())
+      .then((data) => setProducts(data.products))
+      .catch((err) => console.log(err));
   }, []);
 
   if (products.length === 0) {
     return <h2 className="text-center mt-10">Loading...</h2>;
   }
 
-  const categories = [...new Set(products.map(p => p.category))];
+  const categories = [...new Set(products.map((p) => p.category))];
 
   return (
-    <div className='w-full mt-2'>
-
+    <div className="w-full mt-2 overflow-hidden">
       {/* Top Banner */}
-      <div className='w-full max-w-[1300px] mx-auto px-2 sm:px-4'>
-        <img src="img/Frame-1437256605-2-2.jpg" className="w-full rounded-xl" />
+      <div className="w-full max-w-[1300px] mx-auto px-2 sm:px-4">
+        <img
+          src="img/Frame-1437256605-2-2.jpg"
+          className="w-full rounded-xl"
+          alt=""
+        />
       </div>
 
-      {/* Top 3 Images */}
-      <div className="w-full max-w-[1300px] mx-auto grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3 px-2 sm:px-4">
-        <img src="/img/pharmacy-WEB.jpg" className="rounded-xl w-full" />
-        <img src="/img/pet_crystal_WEB-1.png" className="rounded-xl w-full" />
-        <img src="/img/baby_crystal_WEB-1.png" className="rounded-xl w-full" />
+      {/* Top Images */}
+      <div className="w-full max-w-[1300px] mx-auto grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2 px-2 sm:px-4">
+        <img
+          src="/img/pharmacy-WEB.jpg"
+          className="rounded-xl w-full"
+          alt=""
+        />
+        <img
+          src="/img/pet_crystal_WEB-1.png"
+          className="rounded-xl w-full"
+          alt=""
+        />
+        <img
+          src="/img/baby_crystal_WEB-1.png"
+          className="rounded-xl w-full"
+          alt=""
+        />
       </div>
 
-      {/* Mini Categories (UNCHANGED) */}
-      <div className='w-full mt-3'>
-         
+      {/* Mini Categories */}
+      <div className="w-full mt-3">
         <Link to="/category">
           <MininImg products={products} />
         </Link>
       </div>
 
       {/* Sliders */}
-      <div className='w-full max-w-[1300px] mx-auto px-2 sm:px-4'>
-      
+      <div className="w-full max-w-[1300px] mx-auto px-2 sm:px-4">
         {categories.map((cat, index) => {
-
-          let filtered = products.filter(p => p.category === cat);
+          let filtered = products.filter((p) => p.category === cat);
 
           if (filtered.length === 0) return null;
 
-          // repeat fix
           if (filtered.length < 6) {
             const repeat = [...filtered];
             while (filtered.length < 6) {
@@ -70,133 +80,143 @@ export default function Home() {
           );
         })}
       </div>
-
     </div>
   );
 }
 
-
-// 🔽 Mini Categories
-
-
-let MininImg = ({ products }) => {
-
-  const categories = [...new Set(products.map(p => p.category))];
+// Mini Category
+const MininImg = ({ products }) => {
+  const categories = [...new Set(products.map((p) => p.category))];
 
   return (
     <div className="w-full px-[10px] mt-4">
-        <h1 className='font-semibold mb-2'>Category</h1>
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-4">
-        
+      <h1 className="font-semibold mb-2">Category</h1>
+
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3">
         {categories.map((cat, i) => {
-          const product = products.find(p => p.category === cat);
+          const product = products.find((p) => p.category === cat);
 
           return (
-            <div key={i} className="flex flex-col items-center cursor-pointer">
-
+            <div
+              key={i}
+              className="flex flex-col items-center cursor-pointer"
+            >
               <div className="bg-[#f2f3f5] rounded-xl p-3 w-full flex items-center justify-center">
-                <img 
-                  src={product?.thumbnail} 
-                  className="h-[60px] object-contain" 
-                  alt="" 
+                <img
+                  src={product?.thumbnail}
+                  className="h-[55px] sm:h-[60px] object-contain"
+                  alt=""
                 />
               </div>
 
-              <p className="text-xs text-center mt-2 capitalize leading-tight">
+              <p className="text-[11px] sm:text-xs text-center mt-2 capitalize leading-tight">
                 {cat}
               </p>
-
             </div>
           );
         })}
-
       </div>
     </div>
   );
 };
 
-////////////////////////////////////////////////////
-// 🔽 FIXED SLIDER
-////////////////////////////////////////////////////
+// Slider
+const SlickSlider = ({ title, products }) => {
+  const [slides, setSlides] = useState(6);
 
-let SlickSlider = ({ title, products }) => {
+  useEffect(() => {
+    const updateSlides = () => {
+      const width = window.innerWidth;
+
+      if (width <= 640) setSlides(1);
+      else if (width <= 768) setSlides(3);
+      else if (width <= 1024) setSlides(4);
+      else if (width <= 1280) setSlides(5);
+      else setSlides(6);
+    };
+
+    updateSlides();
+    window.addEventListener("resize", updateSlides);
+
+    return () => window.removeEventListener("resize", updateSlides);
+  }, []);
 
   const settings = {
     dots: false,
-    infinite: products.length > 6,
+    infinite: products.length > slides,
     speed: 500,
-    slidesToShow: 6,
+    slidesToShow: slides,
     slidesToScroll: 1,
-    arrows: true,
-    responsive: [
-      { breakpoint: 1280, settings: { slidesToShow: 5 } },
-      { breakpoint: 1024, settings: { slidesToShow: 4 } },
-      { breakpoint: 768, settings: { slidesToShow: 3 } },
-      { breakpoint: 640, settings: { slidesToShow: 2.5 } },
-      { breakpoint: 480, settings: { slidesToShow: 2.2 } }
-    ]
+
+    swipe: true,
+    swipeToSlide: true,
+    draggable: true,
+    touchMove: true,
+
+    waitForAnimate: false,
+    touchThreshold: 8,
+    adaptiveHeight: false,
+
+    arrows: slides > 1,
   };
 
   return (
-    <div className="w-full mt-4">
-
-      <div className="flex justify-between items-center mb-2">
-        <h2 className="text-base sm:text-lg font-semibold capitalize">
+    <div className="w-full mt-5 overflow-hidden">
+      <div className="flex justify-between items-center mb-3">
+        <h2 className="text-sm sm:text-base md:text-lg font-semibold capitalize">
           {title}
         </h2>
+
         <span className="text-green-600 text-xs sm:text-sm cursor-pointer">
           see all
         </span>
       </div>
 
-      <Slider {...settings}>
+      <Slider {...settings} className="mobile-slider">
         {products.map((item, i) => (
-          <div key={i} className="px-1">
+          <div key={i} className="px-2 box-border">
             <ProductCard item={item} />
           </div>
         ))}
       </Slider>
-
     </div>
   );
 };
 
-////////////////////////////////////////////////////
-// 🔽 Product Card
-////////////////////////////////////////////////////
-
-let ProductCard = ({ item }) => {
+// Product Card
+const ProductCard = ({ item }) => {
   return (
-    <div className="bg-white rounded-xl p-2 sm:p-3 shadow-sm border hover:shadow-md transition h-full">
-
+    <div
+      style={{ touchAction: "pan-y" }}
+      className="max-w-full bg-white rounded-xl border shadow-sm hover:shadow-md transition p-3 min-h-[260px] sm:min-h-[280px] flex flex-col"
+    >
       <img
         src={item.thumbnail}
-        className="w-full h-[120px] sm:h-[140px] md:h-[160px] object-contain"
+        className="w-full h-[130px] sm:h-[110px] md:h-[140px] object-contain"
         alt=""
       />
 
-      <p className="text-[10px] bg-gray-100 inline-block px-2 py-[2px] rounded mt-2">
+      <p className="text-[11px] bg-gray-100 inline-block px-2 py-1 rounded mt-2 w-fit">
         ⏱ 11 MINS
       </p>
 
-      <h3 className="text-xs sm:text-sm font-medium mt-1 line-clamp-2">
+      <h3 className="text-sm font-medium mt-2 line-clamp-2 min-h-[42px]">
         {item.title}
       </h3>
 
-      <p className="text-[10px] sm:text-xs text-gray-500">
+      <p className="text-xs text-gray-500 truncate mt-1">
         {item.brand}
       </p>
 
-      <div className="flex justify-between items-center mt-2">
-        <span className="font-semibold text-xs sm:text-sm">
+      <div className="flex justify-between items-center mt-auto pt-3">
+        <span className="font-semibold text-base sm:text-sm">
           ₹{item.price}
         </span>
 
-        <button className="border border-green-600 text-green-600 px-2 sm:px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-green-600 hover:text-white">
+        <button className="border border-green-600 text-green-600 px-4 py-1 rounded-md text-xs font-medium hover:bg-green-600 hover:text-white">
           ADD
         </button>
       </div>
-
     </div>
   );
 };
